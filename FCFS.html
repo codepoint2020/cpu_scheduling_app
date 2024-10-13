@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>FCFS CPU Scheduling</title>
+   
+</head>
+<body>
+
+    <div>
+        <a class="myBtns" href="index.html">Go Back</a>
+    </div>
+    <h1>FCFS CPU Scheduling</h1>
+
+    <div>
+        <div>
+            <label for="processName">Process Name: </label>
+            <input type="text" id="processName">
+        </div>
+
+        <div>
+            <label for="arrivalTime">Arrival Time: </label>
+            <input type="number" id="arrivalTime">
+        </div>
+       
+        <div>
+            <label for="burstTime">Burst Time: </label>
+            <input type="number" id="burstTime">
+        </div>
+        
+        <button onclick="addProcess()">Insert Process</button>
+    </div>
+
+    <h3>Processes</h3>
+    <table id="processTable">
+        <tr>
+            <th>Process Name</th>
+            <th>Arrival Time</th>
+            <th>Burst Time</th>
+        </tr>
+    </table>
+
+    <button onclick="calculateFCFS()">Calculate FCFS</button>
+
+    <h3>Results</h3>
+    <table id="resultTable">
+        <tr>
+            <th>Process Name</th>
+            <th>Arrival Time</th>
+            <th>Burst Time</th>
+            <th>Waiting Time</th>
+            <th>Turnaround Time</th>
+        </tr>
+    </table>
+
+    <h3>Average Waiting Time: <span id="avgWaitingTime"></span></h3>
+
+    <script>
+        let processes = [];
+
+function addProcess() {
+    const processName = document.getElementById("processName").value;
+    const arrivalTime = parseFloat(document.getElementById("arrivalTime").value);
+    const burstTime = parseFloat(document.getElementById("burstTime").value);
+
+    if (processes.length >= 10) {
+        alert("Maximum of 10 processes reached.");
+        return;
+    }
+
+    if (!processName || isNaN(arrivalTime) || isNaN(burstTime)) {
+        alert("Please provide valid inputs for process name, arrival time, and burst time.");
+        return;
+    }
+
+    processes.push({ processName, arrivalTime, burstTime });
+
+    displayProcesses();
+    clearInputs();
+}
+
+function displayProcesses() {
+    const table = document.getElementById("processTable");
+    table.innerHTML = `
+        <tr>
+            <th>Process Name</th>
+            <th>Arrival Time</th>
+            <th>Burst Time</th>
+        </tr>`;
+
+    processes.forEach(process => {
+        const row = table.insertRow();
+        row.insertCell(0).innerText = process.processName;
+        row.insertCell(1).innerText = process.arrivalTime;
+        row.insertCell(2).innerText = process.burstTime;
+    });
+}
+
+function clearInputs() {
+    document.getElementById("processName").value = '';
+    document.getElementById("arrivalTime").value = '';
+    document.getElementById("burstTime").value = '';
+}
+
+function calculateFCFS() {
+    let currentTime = 0;
+    let totalWaitingTime = 0;
+    const results = [];
+    
+    processes.sort((a, b) => a.arrivalTime - b.arrivalTime);
+
+    processes.forEach(process => {
+        const waitingTime = Math.max(0, currentTime - process.arrivalTime);
+        const turnaroundTime = waitingTime + process.burstTime;
+        
+        results.push({
+            processName: process.processName,
+            arrivalTime: process.arrivalTime,
+            burstTime: process.burstTime,
+            waitingTime,
+            turnaroundTime
+        });
+
+        currentTime += process.burstTime;
+        totalWaitingTime += waitingTime;
+    });
+
+    displayResults(results);
+    
+    const avgWaitingTime = totalWaitingTime / processes.length;
+    document.getElementById("avgWaitingTime").innerText = avgWaitingTime.toFixed(2);
+}
+
+function displayResults(results) {
+    const table = document.getElementById("resultTable");
+    table.innerHTML = `
+        <tr>
+            <th>Process Name</th>
+            <th>Arrival Time</th>
+            <th>Burst Time</th>
+            <th>Waiting Time</th>
+            <th>Turnaround Time</th>
+        </tr>`;
+
+    results.forEach(result => {
+        const row = table.insertRow();
+        row.insertCell(0).innerText = result.processName;
+        row.insertCell(1).innerText = result.arrivalTime;
+        row.insertCell(2).innerText = result.burstTime;
+        row.insertCell(3).innerText = result.waitingTime;
+        row.insertCell(4).innerText = result.turnaroundTime;
+    });
+}
+
+    </script>
+
+</body>
+</html>
